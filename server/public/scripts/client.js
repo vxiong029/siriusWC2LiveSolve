@@ -8,6 +8,11 @@ let equation = {
 
 function clearClick(){
     console.log( 'in clearClick');
+    equation.num0 = null;
+    equation.num1 = null;
+    equation.operation = null;
+    $( '#num0In' ).val('');
+    $( '#num1In' ).val('');
 } // end clearClick
 
 function equalsClick(){
@@ -28,10 +33,31 @@ function equalsClick(){
             ${ equation.num0 } ${ equation.operation } ${ equation.num1 } 
             = ${ response.answer }
         `);
-        // request history
-        // display history
+        historyNow();
     }) // end ajax
 } // equalsClick
+
+function historyNow(){
+    // request history
+    $.ajax({
+        method: 'GET',
+        url: '/calculate'
+    }).then( function( response ){
+        console.log( 'back from GET with:', response );
+        // display history
+        let el = $( '#historyOut' );
+        el.empty();
+        // loop through response array
+        for( const historicalEquationThing of response ) {
+            // display an li for each 
+            el.append(`<li>
+                ${ historicalEquationThing.num0 } 
+                ${ historicalEquationThing.operation }
+                ${ historicalEquationThing.num1 }
+            </li>`); //end append
+        } // end for
+    }) //  end $http
+} // historyNow
 
 function operationClick(){
     // get text of clicked button with this class
@@ -49,4 +75,6 @@ function readyNow(){
     $( '#clearButton').on( 'click', clearClick );
     $( '#equalsButton' ).on( 'click', equalsClick ); 
     $( '.operationButton' ).on( 'click', operationClick );
+    // init
+    historyNow();
 } // end readyNow   

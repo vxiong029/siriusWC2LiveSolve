@@ -7,6 +7,7 @@ app.use( express.static( './server/public' ) );
 app.use( bodyParser.urlencoded( { extended: true } ) );
 // globals
 const port = 5000;
+let history = [];
 // spin up server
 app.listen( port, ()=>{
     console.log( 'server is up on:', port );
@@ -14,11 +15,12 @@ app.listen( port, ()=>{
 // routes
 app.get( '/calculate', ( req, res )=>{
     console.log( '/calculate GET hit' );
-    res.send( 'meow' );
+    res.send( history );
 }); // end GET
 
 app.post( '/calculate', ( req, res )=>{
     console.log( '/calculate POST hit:', req.body );
+    history.push( req.body );
     let answer = 0;
     if( req.body.operation === '-'){
         answer = Number( req.body.num0 ) - Number( req.body.num1 );
