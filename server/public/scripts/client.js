@@ -1,24 +1,35 @@
 $( document ).ready( readyNow );
 
 let equation = {
-    num0: null,
-    num1: null,
-    operation: null
+    num0: '',
+    num1: '',
+    operation: ''
 } // end equation
 
 function clearClick(){
     console.log( 'in clearClick');
-    equation.num0 = null;
-    equation.num1 = null;
-    equation.operation = null;
-    $( '#num0In' ).val('');
-    $( '#num1In' ).val('');
+    equation.num0 = '';
+    equation.num1 = '';
+    equation.operation = '';
+    $( '#answerOut' ).val('0');
 } // end clearClick
 
 function equalsClick(){
     console.log( 'in equalsClick' );
-    // set equation num1
-    equation.num1 = $( '#num1In' ).val();
+    // NO DIVISION BY ZEEEEEEEEROOOOOOOOO
+    if( Number( equation.num1 ) === 0 && equation.operation === '/' ){
+        alert( 'NOPE' );
+        return;
+    } // no /0
+    else if( equation.operation === '.' ){
+        alert( 'WUT' );
+        return;
+    } // srsly what even is this?!!?!?!1
+    else if( equation.num0 === '' || equation.operation === '' || equation.num1 === ''  ){
+        alert( 'All fields needed' );
+        return;
+    }
+    
     // send equation to server
     $.ajax({
         method: 'POST',
@@ -26,14 +37,11 @@ function equalsClick(){
         data: equation
     }).then( function( response ){
         console.log( 'back from POST with:', response );
-        // display answer
+        showEquation();
         let el = $( '#answerOut' );
-        el.empty();
-        el.append(`
-            ${ equation.num0 } ${ equation.operation } ${ equation.num1 } 
-            = ${ response.answer }
-        `);
+        el.append(` = ${ response.answer }`);
         historyNow();
+        clearClick();
     }) // end ajax
 } // equalsClick
 
@@ -59,6 +67,19 @@ function historyNow(){
     }) //  end $http
 } // historyNow
 
+function numberClick(){
+    let number = $( this ).text();
+    console.log( 'numberClick:', number );
+    // add number to num0 if no operation chosen
+    if( equation.operation === '' ){
+        equation.num0 += number;
+    } // end no operation
+    else{
+        equation.num1 += number;
+    } // end has operation
+    showEquation();
+} // end numberClick
+
 function operationClick(){
     // get text of clicked button with this class
     let selectedOperation = $( this ).text();
@@ -66,15 +87,24 @@ function operationClick(){
     // set equation operation
     equation.operation = selectedOperation
     // set equation num0
-    equation.num0 = $( '#num0In' ).val();
-    console.log( equation );
+    showEquation();
 } // operationClick
 
 function readyNow(){
     console.log( 'in readyNow' );
     $( '#clearButton').on( 'click', clearClick );
     $( '#equalsButton' ).on( 'click', equalsClick ); 
+    $( '.numberButton' ).on( 'click', numberClick );
     $( '.operationButton' ).on( 'click', operationClick );
     // init
     historyNow();
 } // end readyNow   
+
+function showEquation(){
+    // display answer
+    let el = $( '#answerOut' );
+    el.empty();
+    el.append(`
+        ${ equation.num0 } ${ equation.operation } ${ equation.num1 }
+    `);
+} // showEquation
