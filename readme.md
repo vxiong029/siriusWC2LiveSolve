@@ -7,6 +7,6 @@ Sirius Cohort
 
 [video link](https://vimeo.com) (coming soon)
 
-![button class][buttonClass.png]
+![button class](buttonClass.png)
 
-![steps][steps.png]
+![steps](steps.png)
